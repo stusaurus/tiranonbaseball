@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#72d5ff">
+<title>ティラノンベースボール</title>
+<style>
+  :root{
+    --ink:#4b2e22;--mint:#aee8c8;--mint2:#7fd7ae;--cream:#fff0b6;--orange:#ffb52d;
+    --red:#f15b45;--blue:#2f8ed7;--panel:#fff9e8;--shadow:0 8px 0 rgba(86,49,28,.18);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;min-height:100%;font-family:"Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;background:#dff5ff;color:var(--ink)}
+  body{display:flex;justify-content:center;overflow-x:hidden}
+  button{font:inherit}
+  #game{position:relative;width:min(100%,900px);min-height:100svh;overflow:hidden;background:linear-gradient(#75d8ff 0 38%,#c5f2ff 38% 42%,#84ce68 42% 100%);touch-action:manipulation;user-select:none}
+
+  .cloud{position:absolute;background:white;border-radius:999px;opacity:.82;filter:blur(.2px)}
+  .cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%}
+  .cloud.a{width:110px;height:30px;top:9%;left:4%}.cloud.a:before{width:45px;height:45px;left:17px;bottom:4px}.cloud.a:after{width:58px;height:58px;right:14px;bottom:0}
+  .cloud.b{width:130px;height:32px;top:14%;right:-15px}.cloud.b:before{width:56px;height:56px;left:18px;bottom:2px}.cloud.b:after{width:44px;height:44px;right:24px;bottom:3px}
+
+  #hud{position:absolute;z-index:20;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;pointer-events:none}
+  .hud-card{background:rgba(255,249,232,.94);border:3px solid #fff;border-radius:18px;box-shadow:0 4px 0 rgba(74,46,34,.18);padding:8px 11px;backdrop-filter:blur(3px)}
+  .hud-main{display:flex;gap:10px;align-items:center;min-width:0}
+  .scorebox{min-width:0}.label{font-size:11px;font-weight:800;opacity:.7}.score{font-size:24px;font-weight:1000;line-height:1;letter-spacing:.02em;white-space:nowrap}
+  .best{font-size:11px;font-weight:900;color:#a85f13;margin-top:3px}
+  .balls{display:flex;gap:3px;align-items:center;flex-wrap:wrap;max-width:145px}.ball-dot{width:15px;height:15px;background:#fff;border-radius:50%;border:1px solid #ddd;position:relative}.ball-dot:after{content:"";position:absolute;left:6px;top:1px;width:2px;height:11px;border-left:1px dashed #ed6754;transform:rotate(18deg)}.ball-dot.used{opacity:.22}
+  .mini{display:flex;gap:7px;align-items:center;font-size:13px;font-weight:900}.badge{padding:4px 7px;border-radius:11px;background:#fff1be;white-space:nowrap}.badge.fever{background:#ffe05f;animation:pulse .65s infinite alternate}
+  @keyframes pulse{to{transform:scale(1.06)}}
+  #mute{position:absolute;z-index:30;right:12px;top:96px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.88);box-shadow:0 3px 0 rgba(75,46,34,.15);font-size:19px;cursor:pointer}
+
+  #stadium{position:absolute;left:0;right:0;top:29%;height:20%;background:linear-gradient(#7bb6df 0 17%,#e7f3fb 17% 22%,#4e95c8 22% 100%);border-top:5px solid #eefaff;border-bottom:5px solid #397ca9;overflow:hidden}
+  .crowd{position:absolute;inset:14% 0 0;background-image:radial-gradient(circle,#fff 0 3px,transparent 4px),radial-gradient(circle,#ffd36a 0 3px,transparent 4px),radial-gradient(circle,#ff9e9e 0 3px,transparent 4px),radial-gradient(circle,#9ce0be 0 3px,transparent 4px);background-size:26px 24px,31px 27px,35px 25px,39px 29px;background-position:0 0,9px 12px,15px 6px,22px 14px;opacity:.9}
+  .wall-logo{position:absolute;right:4%;bottom:8px;color:rgba(255,255,255,.8);font-weight:1000;font-size:18px;letter-spacing:.08em}
+
+  #field{position:absolute;left:-10%;right:-10%;bottom:-7%;height:57%;background:radial-gradient(ellipse at 50% 78%,#c98c58 0 24%,transparent 24.5%),linear-gradient(#6fc753,#8bd765);overflow:hidden}
+  #field:before{content:"";position:absolute;width:67%;height:50%;left:16.5%;bottom:2%;background:#c98c58;clip-path:polygon(50% 0,100% 70%,50% 100%,0 70%)}
+  #field:after{content:"";position:absolute;width:7%;aspect-ratio:1;left:46.5%;bottom:14%;background:#f6f4dc;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);box-shadow:0 1px 2px #8b684a}
+
+  #pitcher{position:absolute;z-index:8;left:13%;top:48%;width:86px;text-align:center;transition:transform .2s}
+  .pitcher-body{width:64px;height:68px;margin:auto;background:#8dd5ee;border:4px solid var(--ink);border-radius:48% 48% 42% 42%;position:relative}.pitcher-body:before{content:"";position:absolute;width:42px;height:26px;left:7px;top:10px;background:#e9fbff;border-radius:50%;opacity:.7}.pitcher-body:after{content:"⚾";position:absolute;font-size:20px;right:-15px;top:24px}.pitcher-cap{position:absolute;left:10px;top:-12px;width:43px;height:17px;background:#386fc7;border:4px solid var(--ink);border-radius:50% 50% 20% 20%}
+  #pitcher.throw{animation:throw .45s ease}
+  @keyframes throw{40%{transform:rotate(-9deg) translateY(-7px)}70%{transform:rotate(10deg) translateX(7px)}}
+
+  #batter{position:absolute;z-index:10;right:8%;bottom:11%;width:155px;height:180px;transform-origin:50% 100%}
+  .tira-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 5px 0 rgba(82,54,33,.14))}
+  #bat{position:absolute;z-index:3;width:112px;height:16px;right:77px;top:50px;background:linear-gradient(90deg,#cf7c2b,#f3ba63 70%,#8a4b20 71% 100%);border:4px solid var(--ink);border-radius:999px;transform-origin:100% 50%;transform:rotate(-25deg);transition:transform .08s ease-out}
+  #batter.swing #bat{transform:rotate(78deg)}
+  #batter.swing{animation:bob .18s ease}
+  @keyframes bob{50%{transform:translateY(4px) rotate(2deg)}}
+
+  #pitchBall{position:absolute;z-index:14;width:24px;height:24px;border-radius:50%;background:white;border:2px solid #ddd;box-shadow:0 2px 4px #3457;display:none;will-change:transform}
+  #pitchBall:before,#pitchBall:after{content:"";position:absolute;width:10px;height:14px;border-left:2px dashed #e95c50;border-radius:50%;top:3px}#pitchBall:before{left:4px;transform:rotate(15deg)}#pitchBall:after{right:3px;transform:rotate(195deg)}
+  #pitchBall.meat{background:#a96031;border-color:#6b3b25;border-radius:45% 55% 50% 48%}#pitchBall.meat:before{content:"🍖";border:0;width:auto;height:auto;left:-4px;top:-7px;font-size:31px}#pitchBall.meat:after{display:none}
+
+  #hitZone{position:absolute;z-index:4;right:22%;bottom:27%;width:68px;height:92px;border:2px dashed rgba(255,255,255,.22);border-radius:12px;opacity:0;pointer-events:none}
+  #message{position:absolute;z-index:25;left:50%;top:28%;transform:translateX(-50%);width:92%;text-align:center;font-weight:1000;text-shadow:0 3px 0 white;pointer-events:none}
+  #message .big{font-size:clamp(30px,8vw,64px);line-height:.95;color:var(--red);-webkit-text-stroke:2px #fff;paint-order:stroke fill;filter:drop-shadow(0 4px 0 #a83828)}
+  #message .small{margin-top:8px;font-size:clamp(14px,4vw,23px);color:#6b3d24}
+  #distance{position:absolute;z-index:25;left:50%;top:39%;transform:translateX(-50%);font-weight:1000;font-size:clamp(25px,7vw,52px);color:#fff;text-shadow:0 3px 0 #2c65a5,0 0 8px #2c65a5;opacity:0;pointer-events:none}
+  #flightBall{position:absolute;z-index:17;width:22px;height:22px;background:white;border:2px solid #ddd;border-radius:50%;display:none;box-shadow:0 0 18px 8px #fff68a;will-change:transform}
+
+  #swingBtn{position:absolute;z-index:22;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(72%,360px);height:74px;border:4px solid #fff;border-radius:999px;background:linear-gradient(#ffd952,#ff9d1c);box-shadow:0 8px 0 #b85c18,0 12px 22px #77451a44;color:#9d321b;font-size:30px;font-weight:1000;letter-spacing:.03em;cursor:pointer;transition:transform .05s,box-shadow .05s}
+  #swingBtn:active{transform:translate(-50%,6px);box-shadow:0 2px 0 #b85c18,0 6px 15px #77451a33}
+  #swingBtn:disabled{filter:grayscale(.25);opacity:.55}
+  #tapHint{position:absolute;z-index:21;left:50%;bottom:100px;transform:translateX(-50%);font-size:13px;font-weight:900;color:#fff;text-shadow:0 2px 2px #385;opacity:.9}
+
+  #overlay{position:absolute;z-index:50;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(#72d7ffdd,#e9fbffdd 45%,#82d16fdd);backdrop-filter:blur(2px)}
+  .panel{width:min(100%,520px);background:var(--panel);border:5px solid white;border-radius:30px;box-shadow:var(--shadow),0 18px 45px #49643d55;padding:24px;text-align:center}
+  .logo{font-weight:1000;font-size:clamp(32px,9vw,58px);line-height:.95;color:#65cfa1;-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;filter:drop-shadow(0 5px 0 #f0b62e)}
+  .logo span{display:block;color:#ffae25;font-size:.72em;margin-top:8px}
+  .sub{font-weight:900;margin:18px 0 14px;color:#73472d}.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:14px 0}.rule{background:white;border-radius:15px;padding:9px 4px;font-size:12px;font-weight:900}.rule b{display:block;font-size:20px;margin-bottom:3px}
+  .start{width:100%;border:0;border-radius:999px;padding:16px;background:linear-gradient(#ffd64d,#ff951a);box-shadow:0 6px 0 #b85a17;color:#9a301c;font-size:25px;font-weight:1000;cursor:pointer}.start:active{transform:translateY(4px);box-shadow:0 2px 0 #b85a17}
+  .resultStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:17px 0}.stat{background:#fff;border-radius:16px;padding:10px 5px}.stat .v{font-size:23px;font-weight:1000}.stat .k{font-size:11px;font-weight:800;opacity:.65}.newbest{color:#f05842;font-weight:1000;min-height:24px;margin:5px 0}
+  #overlay.hidden{display:none}
+  .shake{animation:shake .18s linear}@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  #game.fevering:after{content:"FEVER!";position:absolute;z-index:3;inset:0;display:flex;align-items:center;justify-content:center;font-size:18vw;font-weight:1000;color:#fff4;transform:rotate(-12deg);pointer-events:none;animation:feverGlow .6s infinite alternate}@keyframes feverGlow{to{color:#ffe22c66}}
+  @media (max-width:520px){#game{min-height:100svh}.wall-logo{font-size:13px}#batter{right:2%;bottom:14%;width:138px;height:160px}#bat{width:95px;right:68px;top:47px}#pitcher{left:7%;top:50%;transform:scale(.9)}#pitcher.throw{animation:throwSmall .45s ease}@keyframes throwSmall{40%{transform:scale(.9) rotate(-9deg) translateY(-7px)}70%{transform:scale(.9) rotate(10deg) translateX(7px)}}.score{font-size:21px}.balls{max-width:105px}.ball-dot{width:13px;height:13px}.ball-dot:after{height:9px;left:5px}.mini{font-size:11px}.hud-card{padding:7px 8px}}
+</style>
+</head>
+<body>
+<main id="game" aria-label="ティラノンベースボール">
+  <div class="cloud a"></div><div class="cloud b"></div>
+  <div id="stadium"><div class="crowd"></div><div class="wall-logo">TIRANON BASEBALL</div></div>
+  <div id="field"></div>
+
+  <div id="hud">
+    <div class="hud-card hud-main">
+      <div class="scorebox"><div class="label">SCORE</div><div id="score" class="score">0</div><div id="best" class="best">BEST 0</div></div>
+      <div><div class="label">のこり</div><div id="balls" class="balls"></div></div>
+    </div>
+    <div class="hud-card mini"><span id="combo" class="badge">COMBO 0</span><span id="meat" class="badge">🍖 0</span></div>
+  </div>
+  <button id="mute" type="button" aria-label="音を切り替える">🔊</button>
+
+  <div id="pitcher"><div class="pitcher-body"><div class="pitcher-cap"></div></div></div>
+  <div id="batter">
+    <div id="bat"></div>
+    <svg class="tira-svg" viewBox="0 0 160 185" aria-label="ティラノン">
+      <g stroke="#4b2e22" stroke-width="4" stroke-linejoin="round">
+        <path fill="#ffb52d" d="M42 51 27 40 45 32 34 17 55 18 59 1 74 16 87 4 91 24 110 18 105 39z"/>
+        <path fill="#aee8c8" d="M45 52C39 31 54 16 77 15c27-2 51 11 55 34 2 13-4 24-15 31 16 8 24 24 21 43-4 28-29 48-61 48-36 0-62-22-60-51 1-17 9-31 24-39-2-9-1-19 4-29z"/>
+        <path fill="#fff0b6" d="M58 79c20-9 45-5 55 13 11 20 4 52-15 65-15 10-39 6-50-9-12-17-12-57 10-69z" stroke-width="3"/>
+        <path fill="#aee8c8" d="M34 104C15 102 5 89 8 78c2-8 9-9 15-4 8 6 13 17 24 17"/>
+        <path fill="#aee8c8" d="M120 105c18-4 28 4 30 14 2 9-4 15-12 12-9-3-15-11-24-9"/>
+        <path fill="#aee8c8" d="M53 151c-15 8-28 19-22 27 5 7 27 3 42-7"/>
+        <path fill="#aee8c8" d="M100 157c13 10 31 20 38 12 6-7-5-20-22-28"/>
+      </g>
+      <ellipse cx="76" cy="49" rx="6" ry="8" fill="#3d281d"/><ellipse cx="112" cy="47" rx="5" ry="7" fill="#3d281d"/>
+      <circle cx="59" cy="61" r="8" fill="#ff9ea0" opacity=".7"/><circle cx="122" cy="59" r="7" fill="#ff9ea0" opacity=".7"/>
+      <path d="M84 62q12 12 27 0" fill="#ee6d68" stroke="#4b2e22" stroke-width="4" stroke-linecap="round"/><path d="M91 66v7M105 66v7" stroke="#fff" stroke-width="4"/>
+      <circle cx="94" cy="55" r="1.7" fill="#4b2e22"/><circle cx="103" cy="54" r="1.7" fill="#4b2e22"/>
+    </svg>
+  </div>
+  <div id="hitZone"></div>
+  <div id="pitchBall"></div><div id="flightBall"></div>
+  <div id="message"><div id="msgBig" class="big"></div><div id="msgSmall" class="small"></div></div>
+  <div id="distance"></div>
+  <div id="tapHint">画面タップでもスイング！</div>
+  <button id="swingBtn" type="button" disabled>⚾ スイング！</button>
+
+  <section id="overlay">
+    <div class="panel">
+      <div id="titleArea">
+        <div class="logo">ティラノン<span>ベースボール</span></div>
+        <div class="sub">10球勝負！ どこまで飛ばせるかな？</div>
+        <div class="rules">
+          <div class="rule"><b>⚾</b>タイミングで<br>スイング</div>
+          <div class="rule"><b>🔥</b>3連続で<br>フィーバー</div>
+          <div class="rule"><b>🍖</b>お肉球を<br>打ってGET</div>
+        </div>
+      </div>
+      <div id="resultArea" hidden>
+        <div class="logo" style="font-size:42px">ゲームセット！</div>
+        <div class="resultStats">
+          <div class="stat"><div id="finalScore" class="v">0</div><div class="k">スコア</div></div>
+          <div class="stat"><div id="finalHR" class="v">0</div><div class="k">ホームラン</div></div>
+          <div class="stat"><div id="finalDist" class="v">0m</div><div class="k">最高飛距離</div></div>
+        </div>
+        <div id="newBest" class="newbest"></div>
+      </div>
+      <button id="startBtn" class="start" type="button">⚾ スタート</button>
+    </div>
+  </section>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const game=$('#game'), overlay=$('#overlay'), startBtn=$('#startBtn'), swingBtn=$('#swingBtn');
+  const pitcher=$('#pitcher'), batter=$('#batter'), pitchBall=$('#pitchBall'), flightBall=$('#flightBall');
+  const scoreEl=$('#score'),bestEl=$('#best'),ballsEl=$('#balls'),comboEl=$('#combo'),meatEl=$('#meat');
+  const msgBig=$('#msgBig'),msgSmall=$('#msgSmall'),distanceEl=$('#distance'),muteBtn=$('#mute');
+  const titleArea=$('#titleArea'),resultArea=$('#resultArea');
+  const finalScore=$('#finalScore'),finalHR=$('#finalHR'),finalDist=$('#finalDist'),newBest=$('#newBest');
+
+  let score=0,pitchNo=0,combo=0,meat=0,homeRuns=0,maxDistance=0,fever=0;
+  let active=false,pitching=false,swingUsed=false,startTime=0,duration=1400,raf=0,currentP=0,special=false;
+  let muted=false,audioCtx=null,best=Number(localStorage.getItem('tiranonBaseballBest')||0);
+
+  function tone(freq=440,time=.08,type='sine',vol=.08){
+    if(muted) return;
+    try{audioCtx ||= new (window.AudioContext||window.webkitAudioContext)(); const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.value=vol;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+time);o.stop(audioCtx.currentTime+time);}catch(e){}
+  }
+  function hitSound(hr){ tone(hr?660:520,.08,'square',.07); setTimeout(()=>tone(hr?990:720,.13,'triangle',.06),55); }
+  function show(big='',small=''){msgBig.textContent=big;msgSmall.textContent=small;}
+  function makeBalls(){ballsEl.innerHTML='';for(let i=0;i<10;i++){const d=document.createElement('span');d.className='ball-dot'+(i<pitchNo?' used':'');ballsEl.appendChild(d)}}
+  function hud(){scoreEl.textContent=score.toLocaleString();bestEl.textContent='BEST '+best.toLocaleString();comboEl.textContent=(fever>0?'🔥 FEVER ':'COMBO ')+(fever>0?fever:combo);comboEl.classList.toggle('fever',fever>0);meatEl.textContent='🍖 '+meat;makeBalls();game.classList.toggle('fevering',fever>0)}
+  function rectPos(el){const r=el.getBoundingClientRect(),g=game.getBoundingClientRect();return {x:r.left-g.left,y:r.top-g.top,w:r.width,h:r.height}}
+  function pitchPosition(p){const g=game.getBoundingClientRect();const from=rectPos(pitcher),to=rectPos(batter);const x=from.x+from.w*.72+(to.x-from.x)*p;const endY=to.y+to.h*.43;const startY=from.y+from.h*.45;const curve=Math.sin(p*Math.PI)*(special?18:8);const y=startY+(endY-startY)*p-curve;pitchBall.style.transform=`translate(${x}px,${y}px) scale(${.72+p*.35})`;}
+
+  function beginPitch(){
+    if(!active)return;
+    pitching=true;swingUsed=false;currentP=0;special=Math.random()<.14;
+    duration=[1080,1260,1450,1660][Math.floor(Math.random()*4)] + (fever>0?140:0);
+    pitchBall.classList.toggle('meat',special);pitchBall.style.display='block';pitchBall.style.left='-12px';pitchBall.style.top='-12px';
+    pitcher.classList.remove('throw');void pitcher.offsetWidth;pitcher.classList.add('throw');
+    show(pitchNo===9?'ラストボール！':'',special?'🍖 お肉ボール！':'');
+    swingBtn.disabled=false;startTime=performance.now()+260;
+    cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
+  }
+  function loop(now){
+    if(!pitching)return;
+    if(now<startTime){pitchPosition(0);raf=requestAnimationFrame(loop);return}
+    currentP=Math.min(1,(now-startTime)/duration);pitchPosition(currentP);
+    if(currentP>=1){finishPitch('見逃し！','振らなきゃ当たらないノン！',0,false,0);return}
+    raf=requestAnimationFrame(loop);
+  }
+  function swing(){
+    if(!active||!pitching||swingUsed)return;
+    swingUsed=true;batter.classList.add('swing');setTimeout(()=>batter.classList.remove('swing'),150);
+    const ideal=.89, d=Math.abs(currentP-ideal);
+    if(d<=.028){const dist=Math.round(124+(1-d/.028)*34+Math.random()*9);finishPitch('カキーーン！','ジャストミート！',1100+dist*4,true,dist);}
+    else if(d<=.064){const dist=Math.round(93+(1-d/.064)*35+Math.random()*10);const hr=dist>=110;finishPitch(hr?'ホームラン！':'ナイスバッティング！',hr?'伸びたーー！':'いい当たりだノン！',hr?760+dist*3:480+dist*2,hr,dist);}
+    else if(d<=.115){const dist=Math.round(34+Math.random()*46);finishPitch('ヒット！',d<.075?'芯に近い！':'なんとか当てた！',260+dist*2,false,dist);}
+    else if(d<=.17){finishPitch('ファウル！',currentP<ideal?'ちょっと早い！':'ちょっと遅い！',60,false,0);}
+    else{finishPitch('空振り！',currentP<ideal?'まだ早いノン！':'振り遅れたノン！',0,false,0)}
+  }
+  function finishPitch(big,small,points,hr,dist){
+    if(!pitching)return;pitching=false;swingBtn.disabled=true;cancelAnimationFrame(raf);pitchBall.style.display='none';
+    const good=points>=260;
+    if(good){combo++; if(combo===3&&fever===0){fever=3;small+='　🔥フィーバー突入！'} if(special){meat++;small+='　🍖GET！'}} else if(points===0){combo=0}
+    const mult=fever>0?1.5:1; const earned=Math.round(points*mult);score+=earned;
+    if(hr){homeRuns++;hitSound(true);game.classList.add('shake');setTimeout(()=>game.classList.remove('shake'),190)} else if(good){hitSound(false)} else tone(points?300:170,.08,'sawtooth',.04);
+    if(dist>0){maxDistance=Math.max(maxDistance,dist);animateFlight(dist,hr);distanceEl.textContent=dist+'m';distanceEl.style.opacity='1';setTimeout(()=>distanceEl.style.opacity='0',900)}
+    show(big,small+(fever>0&&earned?`　×${mult}`:''));
+    if(fever>0)fever--;
+    pitchNo++;hud();
+    setTimeout(()=>{if(pitchNo>=10)endGame();else beginPitch()},hr?1350:950);
+  }
+  function animateFlight(dist,hr){
+    const g=game.getBoundingClientRect(),from=rectPos(batter);let t0=performance.now();flightBall.style.display='block';
+    const sx=from.x+from.w*.35,sy=from.y+from.h*.35;const ex=Math.min(g.width-35,sx+(hr?g.width*.55:g.width*.28));const ey=hr?g.height*.18:g.height*.48;
+    function f(now){let p=Math.min(1,(now-t0)/(hr?900:600));const x=sx+(ex-sx)*p,y=sy+(ey-sy)*p-Math.sin(Math.PI*p)*(hr?120:55);flightBall.style.transform=`translate(${x}px,${y}px) scale(${1-p*.35})`;if(p<1)requestAnimationFrame(f);else flightBall.style.display='none'}requestAnimationFrame(f);
+  }
+  function startGame(){
+    score=0;pitchNo=0;combo=0;meat=0;homeRuns=0;maxDistance=0;fever=0;active=true;pitching=false;overlay.classList.add('hidden');titleArea.hidden=false;resultArea.hidden=true;startBtn.textContent='⚾ スタート';show('プレイボール！','タイミングよくタップ！');hud();setTimeout(beginPitch,850);
+  }
+  function endGame(){
+    active=false;pitching=false;swingBtn.disabled=true;cancelAnimationFrame(raf);let isBest=score>best;if(isBest){best=score;localStorage.setItem('tiranonBaseballBest',String(best))}hud();
+    finalScore.textContent=score.toLocaleString();finalHR.textContent=homeRuns;finalDist.textContent=maxDistance+'m';newBest.textContent=isBest?'🏆 NEW BEST！':'';titleArea.hidden=true;resultArea.hidden=false;startBtn.textContent='もう1回あそぶ！';overlay.classList.remove('hidden');
+  }
+  startBtn.addEventListener('click',startGame);swingBtn.addEventListener('click',e=>{e.stopPropagation();swing()});
+  game.addEventListener('pointerdown',e=>{if(e.target.closest('button')||!overlay.classList.contains('hidden'))return;swing()});
+  window.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&active){e.preventDefault();swing()}});
+  muteBtn.addEventListener('click',e=>{e.stopPropagation();muted=!muted;muteBtn.textContent=muted?'🔇':'🔊'});
+  hud();
+})();
+</script>
+</body>
+</html>
