@@ -1,0 +1,32 @@
+/* v0.7: animation-first polish */
+.pickup{display:none!important;place-items:center!important;width:88px!important;height:88px!important;overflow:visible!important;contain:none!important;background:radial-gradient(circle,#ffffffee 0 48%,#fff7 49% 58%,transparent 59%)!important;border-radius:50%!important;filter:drop-shadow(0 6px 5px #174b6360)!important;will-change:transform,top,left,opacity!important;}
+.pickupSprite{flex:none;transform-origin:center center;border-radius:16px;box-shadow:0 0 0 2px #fff8;}
+.pickup:before{content:"";position:absolute;inset:8px;border:3px solid #ffffffbb;border-radius:50%;box-shadow:0 0 18px 7px #ffe76b66;animation:itemPulse .75s ease-in-out infinite alternate;pointer-events:none}
+@keyframes itemPulse{to{transform:scale(1.09);opacity:.72}}
+.pickup.hit{animation:pickupHitV7 .34s ease-out forwards!important}
+@keyframes pickupHitV7{0%{filter:brightness(1)}35%{transform:translate(-50%,-50%) scale(1.7) rotate(9deg)!important;filter:brightness(1.65) drop-shadow(0 0 18px #fff)}100%{transform:translate(-50%,-50%) scale(.05) rotate(35deg)!important;opacity:0}}
+#pickupText{top:39%!important;font-size:31px!important;-webkit-text-stroke:6px #286f9b!important;filter:drop-shadow(0 4px 0 #174867)}
+
+/* Keep the hit readable before the chase starts. */
+#kakiin{top:20%!important;font-size:clamp(44px,12vw,92px)!important;}
+#impactBurst{width:190px!important;height:190px!important;left:57%!important;top:47%!important;}
+#batScene.zoomAway{transform:scale(2.05) translate3d(-19%,15%,0)!important;opacity:0!important;filter:blur(4px) saturate(1.15)!important;transition:opacity .22s ease,transform .5s cubic-bezier(.14,.88,.18,1),filter .35s ease!important;}
+#flightScene{opacity:0;transform:scale(.68) translateY(8%)!important;filter:blur(3px);transition:opacity .30s ease .08s,transform .52s cubic-bezier(.15,.9,.2,1),filter .34s ease!important;}
+#flightScene.active{opacity:1;transform:scale(1) translateY(0)!important;filter:blur(0);}
+
+/* More forward-motion cues. */
+#speedLines{opacity:.48!important;animation-duration:.26s!important;}
+#ballComet{width:220px!important;height:38px!important;opacity:.95;filter:blur(6px)!important;}
+#flightBall{box-shadow:0 0 0 6px #fff9,0 0 38px 18px #fff1788c!important;}
+#flightBall.boost{box-shadow:0 0 0 6px #fff9,0 0 60px 26px #ff9b26bb!important;}
+
+/* Make touchdown unmistakable. */
+#landingDust{width:310px!important;height:120px!important;bottom:9%!important;}
+#landText{top:38%!important;font-size:clamp(42px,11vw,84px)!important;}
+#groundLayer:after{content:"";position:absolute;left:50%;top:10%;width:140px;height:38px;transform:translateX(-50%);border:4px solid #ffffff80;border-radius:50%;background:#ffffff15;box-shadow:0 0 20px #fff6;}
+
+@media(max-width:520px){
+ .pickup{width:78px!important;height:78px!important;}
+ #impactBurst{left:59%!important;top:48%!important;}
+ #kakiin{top:22%!important;}
+}
