@@ -1,0 +1,19 @@
+/* v0.5 hotfix: uploaded asset sheet must never leak outside pickup crop */
+.pickup{overflow:hidden!important;contain:paint!important;border-radius:18px!important;background:#fff7e9!important;}
+.pickup svg{width:100%!important;height:100%!important;display:block!important;overflow:hidden!important;clip-path:inset(0 round 18px)!important;}
+.pickup svg image{pointer-events:none;}
+
+/* Make the hit-to-flight transition feel like one camera move instead of a cut. */
+.scene{transition:opacity .58s ease,transform .68s cubic-bezier(.16,.9,.2,1),filter .5s ease!important;}
+#batScene.zoomAway{transform:scale(1.95) translate3d(-18%,14%,0)!important;filter:blur(3px) saturate(1.12)!important;opacity:.04!important;}
+#flightScene{transform:scale(.74) translateY(7%)!important;filter:blur(2px);}
+#flightScene.active{transform:scale(1) translateY(0)!important;filter:blur(0);}
+
+/* Stronger sense of speed without covering the ball. */
+#speedLines{opacity:.38!important;}
+#ballComet{opacity:.9!important;}
+
+/* Keep collectibles from ever expanding to viewport size on mobile Safari. */
+#pickups{overflow:hidden!important;contain:layout paint!important;}
+.pickup{max-width:74px!important;max-height:74px!important;min-width:74px!important;min-height:74px!important;}
+@media(max-width:520px){.pickup{max-width:66px!important;max-height:66px!important;min-width:66px!important;min-height:66px!important;}}
