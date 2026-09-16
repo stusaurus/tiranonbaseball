@@ -1,0 +1,26 @@
+/* v0.9 rebuild: chase mode instead of empty floating-ball screen */
+#flightScene{background:linear-gradient(#58c9ff 0 36%,#bcefff 36% 43%,#69bf55 43% 100%)!important;}
+#flightScene:before{content:"";position:absolute;left:50%;top:40%;width:165%;height:82%;transform:translateX(-50%);background:repeating-conic-gradient(from 0deg at 50% 0%,transparent 0 8deg,#ffffff24 8.3deg 8.8deg,transparent 9.1deg 18deg);clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);pointer-events:none;opacity:.75;z-index:5}
+#flightScene:after{content:"";position:absolute;left:50%;top:42%;width:92%;height:58%;transform:translateX(-50%);background:linear-gradient(90deg,transparent 0 16%,#ffffff44 16.3% 16.8%,transparent 17.1% 49.5%,#ffffff55 49.8% 50.2%,transparent 50.5% 82.9%,#ffffff44 83.2% 83.7%,transparent 84%);clip-path:polygon(47% 0,53% 0,100% 100%,0 100%);pointer-events:none;z-index:6}
+#farClouds{top:5%!important;height:28%!important;opacity:.72!important}
+#mountainLayer{bottom:43%!important;height:22%!important;opacity:.75!important}
+#cityLayer{bottom:38%!important;height:15%!important;opacity:.55!important}
+#treeLayer{bottom:31%!important;height:16%!important}
+#groundLayer{bottom:-8%!important;height:47%!important;transform-origin:50% 0!important;background:linear-gradient(#65c955,#45a943)!important;z-index:4}
+#speedLines{z-index:18!important;opacity:.2!important;background:repeating-conic-gradient(from 0deg at 50% 65%,transparent 0 5deg,#fff7 5.3deg 5.7deg,transparent 6deg 12deg)!important;}
+#flightBall{z-index:30!important;width:54px!important;height:54px!important;top:67%!important;box-shadow:0 0 0 4px #fff9,0 0 24px 10px #fff17672!important}
+#ballComet{z-index:28!important;width:135px!important;height:22px!important;opacity:.72!important;}
+#pickups{position:absolute;inset:0;z-index:26!important;overflow:hidden!important;pointer-events:none}
+.pickup{display:grid!important;position:absolute!important;width:70px!important;height:70px!important;place-items:center!important;background:radial-gradient(circle,#fff 0 36%,#fff8 37% 52%,transparent 53%)!important;border-radius:50%!important;filter:drop-shadow(0 5px 6px #174b636b)!important;overflow:visible!important;opacity:0;}
+.pickupSprite{flex:none!important;transform-origin:center!important;border-radius:14px!important;box-shadow:none!important}
+.pickup:before{content:"";position:absolute;inset:9px;border:2px solid #fff9;border-radius:50%;box-shadow:0 0 14px 5px #ffe76b52;pointer-events:none}
+.pickup.hit{animation:pickupHit9 .28s ease-out forwards!important}@keyframes pickupHit9{35%{filter:brightness(1.8) drop-shadow(0 0 18px white)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.9)!important}}
+#steerHint{z-index:45!important;bottom:max(22px,env(safe-area-inset-bottom))!important;background:#0a335bbd!important}
+#flightHud{z-index:50!important}
+#pickupText{z-index:55!important;top:34%!important}
+#landingDust,#landText{z-index:60!important}
+#batScene.zoomAway{transform:scale(1.55) translate3d(-8%,7%,0)!important;opacity:0!important;filter:blur(2px)!important;transition:opacity .22s ease,transform .42s cubic-bezier(.18,.9,.2,1),filter .3s ease!important}
+#flightScene{opacity:0;transform:scale(.92)!important;filter:blur(2px);transition:opacity .24s ease,transform .42s cubic-bezier(.18,.9,.2,1),filter .3s ease!important}
+#flightScene.active{opacity:1;transform:scale(1)!important;filter:blur(0)}
+#kakiin{top:19%!important}
+@media(max-width:520px){.pickup{width:64px!important;height:64px!important}#flightBall{width:50px!important;height:50px!important}}
