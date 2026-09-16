@@ -1,6 +1,6 @@
-/* v0.7: animation-first polish */
-.pickup{display:none!important;place-items:center!important;width:88px!important;height:88px!important;overflow:visible!important;contain:none!important;background:radial-gradient(circle,#ffffffee 0 48%,#fff7 49% 58%,transparent 59%)!important;border-radius:50%!important;filter:drop-shadow(0 6px 5px #174b6360)!important;will-change:transform,top,left,opacity!important;}
-.pickupSprite{flex:none;transform-origin:center center;border-radius:16px;box-shadow:0 0 0 2px #fff8;}
+/* v0.8: animation-first polish */
+.pickup{display:grid!important;place-items:center!important;width:88px!important;height:88px!important;overflow:visible!important;contain:none!important;background:radial-gradient(circle,#ffffffee 0 48%,#fff7 49% 58%,transparent 59%)!important;border-radius:50%!important;filter:drop-shadow(0 6px 5px #174b6360)!important;will-change:transform,top,left,opacity!important;}
+.pickupSprite{display:block!important;flex:none;transform-origin:center center;border-radius:16px;box-shadow:0 0 0 2px #fff8;}
 .pickup:before{content:"";position:absolute;inset:8px;border:3px solid #ffffffbb;border-radius:50%;box-shadow:0 0 18px 7px #ffe76b66;animation:itemPulse .75s ease-in-out infinite alternate;pointer-events:none}
 @keyframes itemPulse{to{transform:scale(1.09);opacity:.72}}
 .pickup.hit{animation:pickupHitV7 .34s ease-out forwards!important}
